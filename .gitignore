@@ -1,0 +1,19 @@
+# Pixi environment
+.pixi/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Test outputs
+test_output/
+
+# IDE
+.vscode/
+.idea/
+
+# All PDFs (users provide their own, including examples)
+*.pdf
