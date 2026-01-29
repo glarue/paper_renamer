@@ -7,6 +7,7 @@ Automatically rename scientific PDF files based on extracted metadata (title, au
 Requires [pixi](https://pixi.sh/):
 
 ```bash
+git clone https://github.com/glarue/paper_renamer.git
 cd paper_renamer
 pixi install -e default  # Base install (~380MB)
 ```
