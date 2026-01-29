@@ -714,8 +714,23 @@ def query_crossref(doi: str, verbose: bool = False) -> Optional[PaperMetadata]:
 
     try:
         request = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(request, timeout=10) as response:
-            data = json.loads(response.read().decode('utf-8'))
+        # Try with default SSL context first, fall back to unverified if needed
+        try:
+            with urllib.request.urlopen(request, timeout=10) as response:
+                data = json.loads(response.read().decode('utf-8'))
+        except urllib.error.URLError as ssl_err:
+            if 'CERTIFICATE_VERIFY_FAILED' in str(ssl_err):
+                # SSL verification failed (common on macOS), try without verification
+                import ssl
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
+                if verbose:
+                    print("  SSL verification failed, retrying without verification...")
+                with urllib.request.urlopen(request, timeout=10, context=ctx) as response:
+                    data = json.loads(response.read().decode('utf-8'))
+            else:
+                raise
     except (urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError) as e:
         if verbose:
             print(f"  CrossRef lookup failed: {e}")
